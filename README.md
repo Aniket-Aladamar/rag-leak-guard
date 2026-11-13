@@ -76,14 +76,34 @@ MODEL=microsoft/deberta-v3-base EPOCHS=6 LR=3e-5 OUT=./leakguard_v1 python train
 
 The trained checkpoint (about 2.8 GB) is not in this repo. Weights are available on request, and a release may follow.
 
-## Roadmap (v2)
+## v2 results (held-out template families)
 
-1. Paraphrased and LLM-style answers: summaries, partial and implied leaks, multi-chunk and multi-hop answers.
-2. Held-out template families: train on some templates, test on entirely different ones, to measure real generalization.
-3. A learned retriever or attribution model instead of lexical overlap. Measure how much F1 holds without the `[MATCH]` tags.
-4. Untagged and differently formatted chunk metadata.
-5. A larger and more varied PII pool; multiple seeds with confidence intervals.
-6. Longer context models (for example ModernBERT) for realistic chunk counts.
+v2 tests whether the guard survives new wording. `build_data_v2.py` makes two template families. Family A is used for training (16k) and an in-distribution test (3k, `iid`). Family B has different record, header, ACL, query, answer and generic-text templates and is test-only (3k, `ood`). Tenants, people and PII values are disjoint between train and test. There are 8 answer styles: direct, partial, mask, refuse, generic, wrong person, confirm yes and confirm no. About 25% are leaks.
+
+Same model (DeBERTa-v3-base, 5 epochs, 16k examples, one seed), three ways of marking the chunks:
+
+| Chunk tag | iid F1 | OOD F1 | OOD precision | OOD recall | OOD recall@1%FP | OOD AUC |
+|---|---|---|---|---|---|---|
+| none | 0.999 | 0.851 | 0.787 | 0.926 | 0.48 | 0.972 |
+| lexical overlap (v0) | 1.000 | 0.819 | 0.726 | 0.939 | 0.48 | 0.966 |
+| learned embedding (MiniLM top chunk) | 0.999 | **0.917** | 0.902 | 0.934 | **0.83** | **0.984** |
+
+What this says:
+
+- All three are near perfect on familiar templates, so the iid number says little.
+- On unseen templates the v0 lexical tag does worst. The v0 claim that overlap tags are the whole unlock does not hold once wording changes.
+- The embedding tag helps most, and recall at 1% false positives goes from 0.48 to 0.83. OOD F1 is still well below iid, mostly from false alarms on the new family.
+- Still synthetic and templated, one seed, no real LLM answers. Per-style breakdowns are saved in `metrics.json` but not summarised here.
+
+Run: `python build_data_v2.py` then `python run_all.py` (runs TAG=none, lex, emb in turn; needs `sentence-transformers`). About 35-40 minutes per tag on 2 x T4.
+
+## Roadmap (what is left)
+
+1. LLM-written answers: summaries, implied leaks, multi-chunk and multi-hop.
+2. Train on several template families and test on a third.
+3. Untagged and differently formatted chunk metadata.
+4. A larger PII pool and multiple seeds with confidence intervals.
+5. Longer-context models (for example ModernBERT).
 
 ## License
 
