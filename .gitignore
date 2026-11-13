@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+.env
+# generated data and model artifacts
+*.jsonl
+leakguard_v*/
+checkpoint-*/
+*.safetensors
+*.bin
+*.pt
+*.pth
+wandb/
+.DS_Store
