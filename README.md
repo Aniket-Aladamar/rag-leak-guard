@@ -89,3 +89,13 @@ the value-revealing answer styles (direct, partial, confirm_yes). See
 RESULTS_v3.md for the full table and per-style breakdown.
 
 Caveats still apply: synthetic data, single seed.
+
+## Reproducing the v3 runs
+
+`run_all3.py` runs the embedding-tag and no-tag experiments by default. The embedding-tag run needs `sentence-transformers` in addition to the packages in `requirements.txt`. Generate the v3 datasets, then start both runs:
+
+```bash
+pip install -r requirements.txt sentence-transformers
+python build_data_v3.py
+python run_all3.py
+```
