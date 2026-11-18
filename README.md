@@ -1,10 +1,10 @@
-# rag-leak-guard (v0)
+# rag-leak-guard
 
 
 A baseline classifier that answers one question: **given a RAG answer, the retrieved context and the querier's authorization, did the answer leak data the querier is not allowed to see?**
 
 
-Status: v0, research baseline. Trained and tested on synthetic, template-generated data only. Read the "Honest caveats" section before drawing conclusions from the numbers.
+Status: v3 is the latest run (v0 and v2 were earlier iterations). Research baseline, trained and tested on synthetic, template-generated data only. See the caveats in the Results section before drawing conclusions from the numbers.
 
 
 ## Task
@@ -99,3 +99,13 @@ pip install -r requirements.txt sentence-transformers
 python build_data_v3.py
 python run_all3.py
 ```
+
+
+## Roadmap
+
+
+- Test on real RAG traces, not only synthetic templates.
+- Repeat the runs across multiple seeds and report variance.
+- Publish the trained model on Hugging Face.
+- Extend PII coverage to multilingual and Indic-language data.
+- Replace the lexical overlap tagging with a learned answer-to-chunk attributor.
